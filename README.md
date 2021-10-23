@@ -1,0 +1,2 @@
+# afni_MACAQUE_DEMO_REST
+scripts for AFNI's MACAQUE_DEMO_REST
