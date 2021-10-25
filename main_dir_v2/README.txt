@@ -93,6 +93,14 @@ INPUTS and DATA
     *task-rest*.nii.gz : resting state functional (EPI) datasets,
                           which are raw EPIs
 
+  NB: some datasets underwent a light pre-preprocessing
+  here---basically, an extra curation.  In particular, the coordinates
+  for some datasets were unreasonably far from having the data loosely
+  centered around the coordinate origin.  Additionally, some
+  anatomicals were not short type, so we converted them to be (to take
+  up less disk space with essentially no loss of information).  For
+  details, see the README.txt in each data_00_basic/sub*/ directory.
+
 
 + Reference template directory: ./NMT_v2.1_sym/
 
