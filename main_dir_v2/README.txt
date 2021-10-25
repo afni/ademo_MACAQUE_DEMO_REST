@@ -65,131 +65,135 @@ website.
 
 INPUTS and DATA
 
-  ++ Raw (=input) data directory tree:
++ Raw (=input) data directory tree:
 
-     data_00_basic/
-     ├── sub-01/
-     │   ├── README.txt
-     │   └── ses-01/
-     │       ├── anat/
-     │       │   └── sub-01_T1w.nii.gz
-     │       └── func/
-     │           ├── sub-01_ses-01_task-rest_run-01_mion.nii.gz
-     │           └── sub-01_ses-01_task-rest_run-02_mion.nii.gz
-     ├── sub-02/
-     │   ├── README.txt
-     │   └── ses-01/
-     │       ├── anat/
-     │       │   └── sub-02_T1w.nii.gz
-     │       └── func/
-     │           ├── sub-02_ses-02_task-rest_run-01_mion.nii.gz
-     │           └── sub-02_ses-02_task-rest_run-02_mion.nii.gz
-     ├── sub-03
-     ... etc. ...
-     
-     where:
-       *T1w*.nii.gz       : anatomical (T1w) dataset, whole brain, with skull
+  data_00_basic/
+  ├── sub-01/
+  │   ├── README.txt
+  │   └── ses-01/
+  │       ├── anat/
+  │       │   └── sub-01_T1w.nii.gz
+  │       └── func/
+  │           ├── sub-01_ses-01_task-rest_run-01_mion.nii.gz
+  │           └── sub-01_ses-01_task-rest_run-02_mion.nii.gz
+  ├── sub-02/
+  │   ├── README.txt
+  │   └── ses-01/
+  │       ├── anat/
+  │       │   └── sub-02_T1w.nii.gz
+  │       └── func/
+  │           ├── sub-02_ses-02_task-rest_run-01_mion.nii.gz
+  │           └── sub-02_ses-02_task-rest_run-02_mion.nii.gz
+  ├── sub-03
+  ... etc. ...
+  
+  where:
+    *T1w*.nii.gz       : anatomical (T1w) dataset, whole brain, with skull
 
-       *task-rest*.nii.gz : resting state functional (EPI) datasets,
-                            which are raw EPIs
+    *task-rest*.nii.gz : resting state functional (EPI) datasets,
+                          which are raw EPIs
 
 
-  ++ Reference template directory: ./NMT_v2.1_sym/
++ Reference template directory: ./NMT_v2.1_sym/
 
-     This contains macaque standard space data downloaded with
-     @Install_NMT, including datasets at 0.5 mm iso voxel size:
+  This contains macaque standard space data downloaded with
+  @Install_NMT, including datasets at 0.5 mm iso voxel size:
 
-       NMT2_*SS.nii.gz     : skullstripped template, in/defining NMT2 
-                             space (for more info, see Jung et al., 2020)
+    NMT2_*SS.nii.gz     : skullstripped template, in/defining NMT2 
+                          space (for more info, see Jung et al., 2020)
 
-       CHARM*_*.nii.gz     : CHARM atlas in the NMT2 space
-                             (for more info, see Jung et al., 2020)
+    CHARM*_*.nii.gz     : CHARM atlas in the NMT2 space
+                          (for more info, see Jung et al., 2020)
 
-       ... and many more datasets and supplementary files
+    ... and many more datasets and supplementary files
 
 --------------------------------------------------------------------------
 
 SCRIPTS
 
-   Processing scripts are all contained in the ./scripts/ directory.
++ Overview/running
 
-   Each script comes in a pair, such as do_13_aw.tcsh and run_13_aw.tcsh:
+  Processing scripts are all contained in the ./scripts/ directory.
 
-     do_*.tcsh     : a script to process one subject
+  Each script comes in a pair, such as do_13_aw.tcsh and run_13_aw.tcsh:
 
-     run_*.tcsh    : a script to loop over one or more subjects, calling
-                     the associated do_*.tcsh script
+    do_*.tcsh     : a script to process one subject
 
-   The processing scripts are made to be run from the scripts/
-   directory.  To process the data, users should execute the
-   run_*.tcsh scripts, such as with:
+    run_*.tcsh    : a script to loop over one or more subjects, calling
+                    the associated do_*.tcsh script
 
-     tcsh run_20_ap_vox.tcsh
+  The processing scripts are made to be run from the scripts/
+  directory.  To process the data, users should execute the run_*.tcsh
+  scripts, such as with:
 
-   The following pairs are included (each to be run):
+    tcsh run_20_ap_vox.tcsh
 
-   + do_13_aw.tcsh, via run_13_aw.tcsh
+  The following pairs are included (each to be run):
 
-       Run @animal warper to calculate nonlinear warps from the
-       anatomical to a template space (here, NMT); map additional data
-       (e.g., atlases and segmentations) between the spaces; also
-       estimate skullstripping/brainmasking of the anatomical volume.
++ do_13_aw.tcsh, via run_13_aw.tcsh
 
-       These scripts populate the data_13_aw/ directory. Output data
-       include:
+  Run @animal warper to calculate nonlinear warps from the anatomical
+  to a template space (here, NMT); map additional data (e.g., atlases
+  and segmentations) between the spaces; also estimate
+  skullstripping/brainmasking of the anatomical volume.
 
-         - the warps to- and from- standard space
-         - a skull-stripped version of the anatomical
-         - a whole brain mask of the anat
-         - a copy of the NMT warped to the anat orig space
-         - a copy of the D99 atlas warped to the anat orig space
-         - surface versions of the atlases and 'driver' scripts to visualize
-         - QC images of this processing (alignments, etc.)
+  These scripts populate the data_13_aw/ directory. Output data
+  include:
 
-                  
-   + do_20_ap_vox.tcsh, via run_20_ap_vox.tcsh
-   
-       Run afni_proc.py to generate a full FMRI processing script for
-       *voxelwise* analysis, and carry out the processing.  This
-       command uses the output of the *13_aw* scripts.
+    - the warps to- and from- standard space
+    - a skull-stripped version of the anatomical
+    - a whole brain mask of the anat
+    - a copy of the NMT warped to the anat orig space
+    - a copy of the D99 atlas warped to the anat orig space
+    - surface versions of the atlases and 'driver' scripts to visualize
+    - QC images of this processing (alignments, etc.)
 
-       A number of reasonable processing parameters have been chosen
-       (censoring params, pretty light blurring, etc.), but could
-       certainly be tweaked.
+               
++ do_20_ap_vox.tcsh, via run_20_ap_vox.tcsh
 
-   + do_22_ap_roi.tcsh, via run_22_ap_roi.tcsh
-   
-       Run afni_proc.py to generate a full FMRI processing script for
-       *ROI-based* analysis, and carry out the processing.  This
-       command uses the output of the *13_aw* scripts.
+  Run afni_proc.py to generate a full FMRI processing script for
+  *voxelwise* analysis, and carry out the processing.  This command
+  uses the output of the *13_aw* scripts.
 
-       A number of reasonable processing parameters have been chosen
-       (censoring params, etc.), but could certainly be tweaked.
+  A number of reasonable processing parameters have been chosen
+  (censoring params, pretty light blurring, etc.), but could certainly
+  be tweaked.
 
-   + ****
++ do_22_ap_roi.tcsh, via run_22_ap_roi.tcsh
 
+  Run afni_proc.py to generate a full FMRI processing script for
+  *ROI-based* analysis, and carry out the processing.  This command
+  uses the output of the *13_aw* scripts.
 
-    3dNetCorr + fat_mat2d_plot.py : 
-                         Use the provided atlases and calculate
-                         correlation matrices for each subject (using
-                         the afni_proc.py output that did *not*
-                         include smoothing).  The latter program makes
-                         images of the matrices
+  A number of reasonable processing parameters have been chosen
+  (censoring params, etc.), but could certainly be tweaked.
+
++ do_30_pp_roi.tcsh, via run_30_pp_roi.tcsh
+
+  Run some basic post-processing of interest.  Specifically, use the
+  data that was processed for ROI-based analysis and calculate
+  functional correlation matrices, based on average time series after
+  afni_proc.py-processing, using ROIs from the @animal_warper mapping.
+
+  AFNI's 3dNetCorr is used to calculate the matrices, and
+  fat_mat2d_plot.py is used to make plots of each (SVG files, so they
+  can be zoomed arbitrarily).  We use the CHARM atlas for this
+  example.
 
 --------------------------------------------------------------------------
 
-QC OUTPUTS FROM PROCESSING
+QC OUTPUTS FROM PROCESSING (EXAMPLES)
 
 There are QC_* directories that show the QC images of the
 @animal_warper (AW) and afni_proc.py (AP) processing for each subject.
 (This demo is already fairly large, and downloading all processed data
 is unrealistic.)
 
-    QC_data_13_aw      : QC images of the volumetric output from AW.  These
+   + QC_data_13_aw      : QC images of the volumetric output from AW.  These
                          are just JPGs and PNGs, so use any image viewer to 
                          browse.
 
-    QC_data_2?_ap*     : QC HTMLs produced by afni_proc.py to summarize
+   + QC_data_2?_ap*     : QC HTMLs produced by afni_proc.py to summarize
                          and check each block of processing.  These
                          can be viewed in a browser, e.g., using:
 
@@ -203,6 +207,21 @@ is unrealistic.)
 
 Version history
 ---------------
+
+---------------------------------------------------------------------------
+ver  = 2.2; date = Oct 25, 2021
+
++ Realizing I had made a float-> short mistake in converting sub-3222?
+  dset anatomicals (too large of positive values got wrapped to
+  negative ones); have fixed now by scaling the anatomicals down by
+  ten before converting to short.
+
+---------------------------------------------------------------------------
+ver  = 2.1; date = Oct 25, 2021
+
++ Several align_epi_anat specializations added for different dsets; in part
+  because many come from different sites and have very different properties
+  (inhomogeneities, noise, distortions, etc.)
 
 ---------------------------------------------------------------------------
 ver  = 2.0; date = Oct 23, 2021
