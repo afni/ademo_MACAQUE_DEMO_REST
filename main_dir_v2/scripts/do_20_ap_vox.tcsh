@@ -55,38 +55,57 @@ set ref_seg_ab   = SEG
 set ref_mask     = ${dir_ref}/NMT_v2.1_sym_05mm_brainmask.nii.gz 
 set ref_mask_ab  = MASK
 
+
 # AP files
 set sdir_this_ap  = ${sdir_ap_vox}                # pick AP dir (and cmd)
 
 set dsets_epi     = ( ${sdir_epi}/${subj}*task-rest*.nii.gz )
 
-set anat_cp       = ${sdir_aw}/${anat_orig_ab}_ns.nii.gz
+set anat_cp       = ${sdir_aw}/${anat_orig_ab}_nsu.nii.gz
 
 set dsets_NL_warp = ( ${sdir_aw}/${anat_orig_ab}_warp2std_nsu.nii.gz           \
                     ${sdir_aw}/${anat_orig_ab}_composite_linear_to_template.1D \
                     ${sdir_aw}/${anat_orig_ab}_shft_WARP.nii.gz                )
 
-# control variables
 
+# control variables
 set nt_rm        = 2
 set blur_size    = 2.0
 set final_dxyz   = 1.25
 set cen_motion   = 0.1
 set cen_outliers = 0.02
 
+
 # cost function choice: some subjects have MION, while others don't
 if ( "${subj}" == "sub-01" || "${subj}" == "sub-02" || \
      "${subj}" == "sub-03" ) then
-    set cost_a2e = "lpa+zz"
+    set cost_a2e = "lpa+ZZ"
 else
-    set cost_a2e = "lpc+zz"
+    set cost_a2e = "lpc+ZZ"
+endif
+
+# extra align-EPI-to-anat option---some tricky brightness
+# inhomogeneities in some EPIs
+if ( "${subj}" == "sub-032223" || "${subj}" == "sub-03" ) then
+    set aea_extra = "-rigid_body"
+else
+    set aea_extra = ""
+endif
+
+# another align-EPI-to-anat option---some tricky brightness
+# inhomogeneities in some EPIs
+if ( "${subj}" == "sub-01" || "${subj}" == "sub-03" || \
+     "${subj}" == "sub-032309" ) then
+    set aea_uni_epi = "no"
+else
+    set aea_uni_epi = "yes"
 endif
 
 
 # check available N_threads and report what is being used
 # + consider using up to 16 threads (alignment programs are parallelized)
 # + N_threads may be set elsewhere; to set here, uncomment the following line:
-### setenv OMP_NUM_THREADS 16
+### setenv OMP_NUM_THREADS 8
 
 set nthr_avail = `afni_system_check.py -check_all | \
                       grep "number of CPUs:" | awk '{print $4}'`
@@ -144,34 +163,35 @@ cat <<EOF >! ${ap_cmd}
 
 # -----------------------------------------------------------------
 
-afni_proc.py                                                              \
-    -subj_id                  ${subj}                                     \
-    -blocks            tshift align tlrc volreg blur mask scale regress   \
-    -dsets                    ${dsets_epi}                                \
-    -copy_anat                ${anat_cp}                                  \
-    -anat_has_skull           no                                          \
-    -anat_uniform_method      none                                        \
-    -radial_correlate_blocks  tcat volreg                                 \
-    -radial_correlate_opts    -sphere_rad 14                              \
-    -tcat_remove_first_trs    ${nt_rm}                                    \
-    -volreg_align_to          MIN_OUTLIER                                 \
-    -volreg_align_e2a                                                     \
-    -volreg_tlrc_warp                                                     \
-    -volreg_warp_dxyz         ${final_dxyz}                               \
-    -volreg_compute_tsnr      yes                                         \
-    -align_opts_aea           -cost "${cost_a2e}" -giant_move             \
-                              -cmass cmass -feature_size 0.5              \
-    -tlrc_base                ${ref_base}                                 \
-    -tlrc_NL_warp                                                         \
-    -tlrc_NL_warped_dsets     ${dsets_NL_warp}                            \
-    -blur_size                ${blur_size}                                \
-    -regress_apply_mot_types  demean deriv                                \
-    -regress_censor_motion    ${cen_motion}                               \
-    -regress_censor_outliers  ${cen_outliers}                             \
-    -regress_motion_per_run                                               \
-    -regress_est_blur_errts                                               \
-    -regress_est_blur_epits                                               \
-    -regress_run_clustsim     no                                          \
+afni_proc.py                                                                \
+    -subj_id                  ${subj}                                       \
+    -blocks            tshift align tlrc volreg blur mask scale regress     \
+    -dsets                    ${dsets_epi}                                  \
+    -copy_anat                ${anat_cp}                                    \
+    -anat_has_skull           no                                            \
+    -anat_uniform_method      none                                          \
+    -radial_correlate_blocks  tcat volreg                                   \
+    -radial_correlate_opts    -sphere_rad 14                                \
+    -tcat_remove_first_trs    ${nt_rm}                                      \
+    -volreg_align_to          MIN_OUTLIER                                   \
+    -volreg_align_e2a                                                       \
+    -volreg_tlrc_warp                                                       \
+    -volreg_warp_dxyz         ${final_dxyz}                                 \
+    -volreg_compute_tsnr      yes                                           \
+    -align_opts_aea           -cost "${cost_a2e}" -giant_move               \
+                              -cmass cmass -feature_size 0.5 ${aea_extra}   \
+    -align_unifize_epi        ${aea_uni_epi}                                \
+    -tlrc_base                ${ref_base}                                   \
+    -tlrc_NL_warp                                                           \
+    -tlrc_NL_warped_dsets     ${dsets_NL_warp}                              \
+    -blur_size                ${blur_size}                                  \
+    -regress_motion_per_run                                                 \
+    -regress_apply_mot_types  demean deriv                                  \
+    -regress_censor_motion    ${cen_motion}                                 \
+    -regress_censor_outliers  ${cen_outliers}                               \
+    -regress_est_blur_errts                                                 \
+    -regress_est_blur_epits                                                 \
+    -regress_run_clustsim     no                                            \
     -html_review_style        pythonic 
 
 EOF
