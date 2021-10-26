@@ -86,7 +86,8 @@ endif
 
 # extra align-EPI-to-anat option---some tricky brightness
 # inhomogeneities in some EPIs
-if ( "${subj}" == "sub-032223" || "${subj}" == "sub-03" ) then
+if ( "${subj}" == "sub-032223" || "${subj}" == "sub-03" || \
+     "${subj}" == "sub-032309" ) then
     set aea_extra = "-rigid_body"
 else
     set aea_extra = ""
