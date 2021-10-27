@@ -141,9 +141,12 @@ foreach ff ( ${ref_atl} )
     set ooo     = `3dinfo -prefix_noext ${epi_atl}`
     set onet    = ${sdir_pp_roi}/${ooo}
 
+    # note the use of "-allow_roi_zeros -push_thru_many_zeros":
+    # because of the FOV of some dsets, a couple finer ROIs end up
+    # being all zeros, and some ROIs fall outside the acquired data
     3dNetCorr -echo_edu                         \
         -overwrite                              \
-        -allow_roi_zeros -push_thru_many_zeros         \
+        -allow_roi_zeros -push_thru_many_zeros  \
         -fish_z                                 \
         -inset   ${errts}                       \
         -in_rois ${epi_atl}                     \
