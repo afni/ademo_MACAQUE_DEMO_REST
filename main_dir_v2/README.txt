@@ -18,7 +18,7 @@ And please feel free to ask questions on the AFNI Message Board!
 
 --------------------------------------------------------------------------
 
-SITES PROVIDING DATA, 
+SITES PROVIDING DATA
 
 The data comes from multiple centers, and has all been shared as part
 of PRIME-DE.  Contributing people+sites for this specific dataset are
@@ -37,10 +37,11 @@ Thanks to all of them for collecting+providing this data publicly.
 
 We use the original data from a single session in each case (2 EPIs
 and 1 T1w anatomical).  All datasets have been converted to "short"
-dtype, in order to keep file sizes (relatively) small.  This
-introduces a tiny roundoff error, but since the scale of values in all
-cases typically of order 1000, this should be a negligible
-consideration.
+dtype, in order to keep file sizes (relatively) small; for a couple
+subj, this required downscaling the volume values by 10.  In all of
+these rounding cases, this process introduces a tiny roundoff error,
+but since the scale of values in all cases typically of order 1000,
+this should be a negligible consideration.
 
 In some cases, the coordinates had to be reset for one or more
 datasets, likely due to some step in converting DICOMs or other
@@ -61,7 +62,6 @@ about each, but more information is also present on the PRIME-DE
 website.
 
 --------------------------------------------------------------------------
-
 
 INPUTS and DATA
 
@@ -197,18 +197,51 @@ There are QC_* directories that show the QC images of the
 (This demo is already fairly large, and downloading all processed data
 is unrealistic.)
 
-   + QC_data_13_aw      : QC images of the volumetric output from AW.  These
-                         are just JPGs and PNGs, so use any image viewer to 
-                         browse.
+   + QC_data_13_aw     : QC images of the volumetric output from AW.
+                         These are just JPGs and PNGs, so use any
+                         image viewer to browse. Some command line
+                         examples of opening all images, or just those
+                         of one particular QC type, are:
 
-   + QC_data_2?_ap*     : QC HTMLs produced by afni_proc.py to summarize
+                         # Linux
+                         eog  QC_data_13_aw/sub-0*/*/QC/*png
+                         eog  QC_data_13_aw/sub-0*/*/QC/qc_00*sag*png
+
+                         # Mac
+                         open QC_data_13_aw/sub-0*/*/QC/*png
+                         open QC_data_13_aw/sub-0*/*/QC/qc_00*sag*png
+
+
+   + QC_data_20_ap_vox : QC HTMLs produced by afni_proc.py to summarize
                          and check each block of processing.  These
                          can be viewed in a browser, e.g., using:
 
-                         firefox QC_data_20_ap_vox/sub-0*/*/QC*/index.html
+                         firefox QC_data_20_ap_vox/sub-0*/*/*/QC*/index.html
+                         or 
+                         firefox `find QC_data_20*/ -name index.html | sort`
 
-****data_03_postproc   : The correlation matrix output from the 3dNetCorr 
-                         and images of these matrices via fat_mat2d_plot.py
+   + QC_data_22_ap_roi : QC HTMLs produced by afni_proc.py to summarize
+                         and check each block of processing.  These
+                         can be viewed in a browser, e.g., using:
+
+                         firefox QC_data_22_ap_roi/sub-0*/*/*/QC*/index.html
+                         or 
+                         firefox `find QC_data_22*/ -name index.html | sort`
+
+   + QC_data_03_postproc : The correlation matrix output from the
+                         3dNetCorr and images of these matrices via
+                         fat_mat2d_plot.py. Some command line examples
+                         of opening all images, or just those of one
+                         particular QC type, are:
+
+                         # Linux
+                         eog  QC_data_30*/sub-0*/*/*svg
+                         eog  QC_data_30*/sub-0*/*/*CHARM*003*svg
+
+                         # Mac
+                         open QC_data_30*/sub-0*/*/*svg
+                         open QC_data_30*/sub-0*/*/*CHARM*003*svg
+
 
 ============================================================================
 ============================================================================
