@@ -21,7 +21,8 @@ set dir_log       = ${dir_inroot}/logs
 set dir_swarm     = ${dir_inroot}/swarm 
 
 # running 
-set scr_swarm     = ${dir_swarm}/swarm_${cmd}.tcsh
+set scr_swarm     = ${dir_swarm}/swarm_${cmd}.tcsh  # cmds to run, 1 per line
+set scr           = ${dir_scr}/do_${cmd}.tcsh       # processing scr to use
 
 # --------------------------------------------------------------------------
 
@@ -36,43 +37,38 @@ endif
 
 # --------------------------------------------------------------------------
 
-# make list of subject IDs, could be done in various ways (e.g., just
-# a directly-made array of IDs):
-### set all_subj = ( sub-01 sub-02 sub-03 sub-032222 sub-032223 sub-032309 )
+# Make list of subj to proc; could be done many ways (e.g., direct list)
 cd ${dir_basic}
-set all_subj = `find ./ -maxdepth 1 -type d | cut -b3- | sort`
+set all_subj = ( sub-* )
 cd -
 
 echo ""
 echo "++ Proc command:  ${cmd}"
 echo ""
 echo "++ Found ${#all_subj} subj:"
-echo "   ${all_subj}"
 echo ""
 
-# loop over all subjs, and build script to run each cmd
+# 1) loop over all subjs, and build a 'swarm' script to run each cmd
+# 2) proc each ses separately: assume each session has own anat and func
 foreach subj ( ${all_subj} ) 
 
-    # For each subject, get name of session directory.  There should
-    # only be 1 per subj, for the way this is presently scripted
+    # list all ses per subj
     cd ${dir_basic}/${subj}
-    set ses = `find . -maxdepth 1 -type d -name "ses*" | cut -b3-`
+    set all_ses = ( ses-* )
     cd -
 
-    if ( "${#ses}" != "1" ) then
-        echo "** ERROR: supposed to have exactly 1 ses per subj,"
-        echo "   but subj '${subj}' has ${#ses} session dirs."
-        exit 1
-    endif
+    foreach ses ( ${all_ses} )
 
-# Put that subj into 'swarm' script (verbosely, and don't use '-e'),
-# and use 'tee' to log terminal text.  Do NOT indent the next section
-# between cat << EOF ... EOF
-cat << EOF >> ${scr_swarm}
-time tcsh -xf ${dir_scr}/do_${cmd}.tcsh  ${subj}  ${ses}          \
-       |& tee ${dir_log}/log_${cmd}_${subj}_${ses}.txt
-EOF
+        echo "++ Prepare cmd for:  ${subj} --- ${ses}"
 
+        set log = ${dir_log}/log_${cmd}_${subj}_${ses}.txt
+
+        # Build 'swarm' script ('-x' for verbosity; don't use '-e').
+        # Make log with 'tee'.
+        echo "time tcsh -xf ${scr}  ${subj} ${ses} \\"   >> ${scr_swarm}
+        echo "       |& tee ${log}"                      >> ${scr_swarm}
+
+    end
 end
 
 # --------------------------------------------------------------------
@@ -80,6 +76,6 @@ end
 # return to script dir and execute 'swarm' script
 cd ${dir_scr}
 
-echo "++ Executing cmd script: ${scr_swarm}"
+echo "++ Executing 'swarm' cmd script: ${scr_swarm}"
 
 tcsh ${scr_swarm}

@@ -21,15 +21,11 @@ set dir_ref        = ${dir_inroot}/NMT_v2.1_sym/NMT_v2.1_sym_05mm
 set dir_basic      = ${dir_inroot}/data_00_basic
 set dir_aw         = ${dir_inroot}/data_13_aw
 
-set dir_ap         = ${dir_inroot}/data_20_ap
-
 # subject directories
 set sdir_basic     = ${dir_basic}/${subj}/${ses}
 set sdir_anat      = ${sdir_basic}/anat
 set sdir_epi       = ${sdir_basic}/func
 set sdir_aw        = ${dir_aw}/${subj}/${ses}
-
-set sdir_ap        = ${dir_ap}/${subj}/${ses}
 
 # --------------------------------------------------------------------------
 # data and control variables

@@ -1,7 +1,6 @@
 #!/bin/tcsh
 
-# AP: run afni_proc.py to process the resting state FMRI time series
-# for an ROI-based study
+# AP: run afni_proc.py to process resting state FMRI for an ROI-based study.
 
 # Process a single subj+ses pair.  Run this script in
 # MACAQUE_DEMO_REST/scripts/, via the corresponding run_*tcsh script.
@@ -13,6 +12,7 @@
 # labels
 set subj           = $1
 set ses            = $2
+set ap_label       = 22_ap_roi
 
 # upper directories
 set dir_inroot     = ${PWD:h}                        # one dir above scripts/
@@ -21,18 +21,14 @@ set dir_ref        = ${dir_inroot}/NMT_v2.1_sym/NMT_v2.1_sym_05mm
 
 set dir_basic      = ${dir_inroot}/data_00_basic
 set dir_aw         = ${dir_inroot}/data_13_aw
-
-set dir_ap_vox     = ${dir_inroot}/data_20_ap_vox
-set dir_ap_roi     = ${dir_inroot}/data_22_ap_roi
+set dir_ap         = ${dir_inroot}/data_${ap_label}
 
 # subject directories
 set sdir_basic     = ${dir_basic}/${subj}/${ses}
 set sdir_anat      = ${sdir_basic}/anat
 set sdir_epi       = ${sdir_basic}/func
 set sdir_aw        = ${dir_aw}/${subj}/${ses}
-
-set sdir_ap_vox    = ${dir_ap_vox}/${subj}/${ses}
-set sdir_ap_roi    = ${dir_ap_roi}/${subj}/${ses}
+set sdir_ap        = ${dir_ap}/${subj}/${ses}
 
 # --------------------------------------------------------------------------
 # data and control variables
@@ -57,18 +53,17 @@ set ref_mask_ab  = MASK
 
 
 # AP files
-set sdir_this_ap  = ${sdir_ap_roi}                # pick AP dir (and cmd)
-
 set dsets_epi     = ( ${sdir_epi}/${subj}*task-rest*.nii.gz )
 
-set anat_cp       = ${sdir_aw}/${anat_orig_ab}_ns.nii.gz
+set anat_cp       = ${sdir_aw}/${anat_orig_ab}_nsu.nii.gz
 
 set dsets_NL_warp = ( ${sdir_aw}/${anat_orig_ab}_warp2std_nsu.nii.gz           \
                     ${sdir_aw}/${anat_orig_ab}_composite_linear_to_template.1D \
                     ${sdir_aw}/${anat_orig_ab}_shft_WARP.nii.gz                )
 
 
-# control variables: NO smoothing here, because ROI-based proc
+# control variables
+# + NO smoothing here, because ROI-based proc
 set nt_rm        = 2
 set final_dxyz   = 1.25
 set cen_motion   = 0.1
@@ -119,9 +114,9 @@ setenv AFNI_COMPRESSOR GZIP
 # run programs
 # ---------------------------------------------------------------------------
 
-set ap_cmd = ${sdir_this_ap}/ap.cmd.${subj}
+set ap_cmd = ${sdir_ap}/ap.cmd.${subj}
 
-\mkdir -p ${sdir_this_ap}
+\mkdir -p ${sdir_ap}
 
 # write AP command to file
 cat <<EOF >! ${ap_cmd}
@@ -187,10 +182,10 @@ afni_proc.py                                                                \
     -tlrc_base                ${ref_base}                                   \
     -tlrc_NL_warp                                                           \
     -tlrc_NL_warped_dsets     ${dsets_NL_warp}                              \
+    -regress_motion_per_run                                                 \
     -regress_apply_mot_types  demean deriv                                  \
     -regress_censor_motion    ${cen_motion}                                 \
     -regress_censor_outliers  ${cen_outliers}                               \
-    -regress_motion_per_run                                                 \
     -regress_est_blur_errts                                                 \
     -regress_est_blur_epits                                                 \
     -regress_run_clustsim     no                                            \
@@ -198,7 +193,7 @@ afni_proc.py                                                                \
 
 EOF
 
-cd ${sdir_this_ap}
+cd ${sdir_ap}
 
 # execute AP command to make processing script
 tcsh -xef ${ap_cmd} |& tee output.ap.cmd.${subj}
@@ -206,6 +201,6 @@ tcsh -xef ${ap_cmd} |& tee output.ap.cmd.${subj}
 # execute the proc script, saving text info
 time tcsh -xef proc.${subj} |& tee output.proc.${subj}
 
-echo "++ FINISHED AP"
+echo "++ FINISHED AP: ${ap_label}"
 
 exit 0
