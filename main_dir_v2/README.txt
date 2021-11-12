@@ -250,6 +250,11 @@ Version history
 ---------------
 
 ---------------------------------------------------------------------------
+ver  = 2.3; date = Nov 12, 2021
+
++ Update do*tcsh scripts to be simpler (really!)
+
+---------------------------------------------------------------------------
 ver  = 2.2; date = Oct 25, 2021
 
 + Realizing I had made a float-> short mistake in converting sub-3222?
