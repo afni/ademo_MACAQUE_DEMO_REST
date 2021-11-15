@@ -250,6 +250,11 @@ Version history
 ---------------
 
 ---------------------------------------------------------------------------
+ver  = 2.3.1; date = Nov 15, 2021
+
++ Minor update in do*tcsh scripts: ASC gets num of cpu more easily
+
+---------------------------------------------------------------------------
 ver  = 2.3; date = Nov 12, 2021
 
 + Update do*tcsh scripts to be simpler (really!)

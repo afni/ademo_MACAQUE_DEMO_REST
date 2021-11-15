@@ -55,8 +55,7 @@ set ref_mask_ab  = MASK
 # + N_threads may be set elsewhere; to set here, uncomment the following line:
 ### setenv OMP_NUM_THREADS 16
 
-set nthr_avail = `afni_system_check.py -check_all | \
-                      grep "number of CPUs:" | awk '{print $4}'`
+set nthr_avail = `afni_system_check.py -disp_num_cpu`
 set nthr_using = `afni_check_omp`
 
 echo "++ INFO: Using ${nthr_avail} of available ${nthr_using} threads"
